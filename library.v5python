@@ -22,3 +22,94 @@ def user_control():
 # create competition instance
 comp = Competition(user_control, autonomous)
 pre_autonomous()
+
+
+#--------------------------------------------------
+# Detecting Apriltags with the AI Vison Sensor
+
+while True:
+    brain.screen.clear_screen()
+    brain.screen.set_cursor(1, 1)
+    # Take a snapshot of all AprilTags.
+    snapshot_objects = ai_vision_1.take_snapshot(AiVision.ALL_TAGS);
+    # Check to see if an AprilTag exists in this snapshot.
+    if snapshot_objects and len(snapshot_objects) > 0:
+        # Determine which AprilTag is detected.
+        if snapshot_objects[0].id == 1:
+            # Conditional based on finding TagID #1.
+            brain.screen.print("Found TagID 1")
+        elif snapshot_objects[0].id == 2:
+            # Conditional based on finding TagID #2.
+            brain.screen.print("Found TagID 2")
+        else:
+            # Else condition will print any other TagID found.
+            brain.screen.print("Found TagID")
+            brain.screen.next_row()
+            brain.screen.print("TagID: ")
+            brain.screen.print(snapshot_objects[0].id)
+    else:
+        # If no AprilTags are found in this snapshot, display a message.
+        brain.screen.print("No AprilTags")
+    # Wait some time and restart loop.
+    wait(0.3, SECONDS)
+    wait(5, MSEC)
+
+
+#--------------------------------------------------
+# Tracking and drawing objects example
+
+#    Configuration:  V5 Clawbot (Drivetrain 2-motor, No Gyro)
+#                    ClawMotor on Port 3
+#                    ArmMotor on Port 8
+#                    AI Vision on Port 6
+
+while True: 
+    # Take a snapshot to create an array of detected objects
+    ai_vision_6_objects = ai_vision_6.take_snapshot(ai_vision_6__BlueBox)
+
+    # Check if there is an existing object at the start of the array
+    if ai_vision_6_objects[0].exists:
+
+        # An object exists, so lets try and center the sensor on the object.
+        # The AI Vision Sensor returns a 320x240 frame, meaning centerX needs
+        # to be 160 for the Sensor to be centered on the object. For this
+        # example we will go with a center range of 130 < x < 190. This gives
+        # us an acceptable margin of error of 30px in either direction.
+        if ai_vision_6_objects[0].centerX > 190:
+            # turn in 5 degree increments to avoid the risk of turning too far
+            drivetrain.turn_for(RIGHT, 5, DEGREES)
+        elif ai_vision_6_objects[0].centerX < 130:
+            # turn in 5 degree increments to avoid the risk of turning too far
+            drivetrain.turn_for(LEFT, 5, DEGREES)
+        else:
+            # Now the object is centered, let's move closer to the object.
+            # Keep driving forward until the object height reaches 120.
+            if ai_vision_6_objects[0].height < 120:
+                drivetrain.drive(FORWARD)
+            else:
+                # Once the object height reaches 120, we know the object is
+                # close since it is occupying 1/2 of the 320x240 frame.
+                drivetrain.stop()
+
+        # Prepare to draw the video stream of the detected object in real time.
+        brain.screen.clear_screen()
+        brain.screen.set_pen_color(Color.BLUE)
+        brain.screen.set_fill_color(Color.BLUE)
+
+        # We must draw a line to represent the edge of the 320x240 frame.
+        # Any drawn object will not go outside of this barrier.
+        brain.screen.draw_line(320, 0, 320, 239)
+
+        # Using the properties of the existing object(i.e. BlueBox),
+        # we can draw the object on the Brain screen.
+        brain.screen.draw_rectangle(
+            ai_vision_6_objects[0].originX,
+            ai_vision_6_objects[0].originY,
+            ai_vision_6_objects[0].width,
+            ai_vision_6_objects[0].height)
+    else:
+        # No object detected, clear the brain screen and stop driving.
+        brain.screen.clear_screen()
+        drivetrain.stop()
+
+    wait(5, MSEC)
