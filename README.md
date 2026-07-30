@@ -1,6 +1,6 @@
 ### To Do for Autonomous period:
 
-[ ] 1. Climb ramp using line detection
+[x] 1. Climb ramp using line detection
 
 [ ] 2. Go all the way to the back wall
 
