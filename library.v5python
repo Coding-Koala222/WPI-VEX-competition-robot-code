@@ -23,6 +23,41 @@ def user_control():
 comp = Competition(user_control, autonomous)
 pre_autonomous()
 
+#--------------------------------------------------
+# Detecting April Tags
+def FindAprilElement(ID):
+    global objects
+
+    for element in range(6):
+
+        if(objects[element].id == ID):
+            return element
+
+    return -1
+
+
+AprilElement = -1
+CurrentID = 10
+
+while(True):
+  # takes a snapshot and searches for all April Tags
+
+  objects = ai_vision_15.take_snapshot(AiVision.ALL_TAGS)
+  wait(40)  
+    
+  if (objects[0].exists == True):
+    AprilElement = FindAprilElement(CurrentID)
+
+  if (AprilElement > -1):
+    brain.screen.print_at('x: ', objects[AprilElement].centerX, x = 50, y = 40)
+    brain.screen.print_at('   y:',  objects[AprilElement].centerY, x = 150, y = 40)
+    brain.screen.print_at('  width:', objects[AprilElement].width, x = 250, y = 40)
+    brain.screen.print_at('April Tag Number = ', objects[AprilElement].id, x = 50, y =100)
+    brain.screen.print_at('Element Number is ', AprilElement, x = 50, y = 150)
+    print('April Tag Number = ', objects[AprilElement].id, '  Element Number is ', AprilElement)
+    wait(90)
+
+  brain.screen.clear_screen()
 
 #--------------------------------------------------
 # Detecting Apriltags with the AI Vison Sensor
