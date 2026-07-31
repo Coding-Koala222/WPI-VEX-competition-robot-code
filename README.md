@@ -1,3 +1,5 @@
+## [Internal info](https://docs.google.com/document/d/1P6mpjVkausVqrALm_940JYyPTmhPE2a1xk6AjW0EgyI/edit?tab=t.0)
+
 ### To Do for Autonomous period:
 
 [x] 1. Climb ramp using line detection
